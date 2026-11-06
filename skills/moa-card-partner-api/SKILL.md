@@ -10,8 +10,8 @@ description: "MOA 카드 파트너 API(api.moacard.io/partner/v1) 연동·디버
 ## 이용 가능 환경
 
 - Base URL: `https://api.moacard.io/partner/v1` (테스트·운영 같은 주소, 환경은 API Key로 결정)
-- **지금 먼저 쓸 수 있는 것은 테스트 환경(`pk_test_…` / `sk_test_…`)이다.** 입금·KYC 결과·카드 등록·결제를 모의로 처리하고 테스트 전용 API를 쓴다.
-- **운영 환경(`pk_live_…`)은 회사가 별도로 공지한 뒤 열린다.** 열리기 전 운영 키는 `403 environment_unavailable`. 날짜를 추측해 안내하지 않는다.
+- 테스트 환경(`pk_test_…` / `sk_test_…`)은 입금·KYC 결과·카드 등록·결제를 모의로 처리하고 테스트 전용 API를 쓴다.
+- 운영 환경(`pk_live_…`)은 실제 카드 발급사와 연결된다. 운영 키가 아직 활성화되지 않았으면 `403 environment_unavailable`(활성화 시점은 회사 담당자에게 확인, 추측해 안내하지 않는다).
 - 키·허용 IP·웹훅 주소는 회사 담당자에게 환경별로 요청한다(비밀키는 발급 때 한 번만 전달).
 
 ## 반드시 지킬 규칙
@@ -64,7 +64,7 @@ description: "MOA 카드 파트너 API(api.moacard.io/partner/v1) 연동·디버
 
 1. `X-Request-Id`와 `error.code`·`details`를 먼저 본다(`message`로 분기하지 않는다).
 2. `401 Invalid API key or signature.` → 고정값 self-test → 키·비밀키 환경 짝 → `/partner/v1` 경로 → 쿼리 그대로 → 본문 바이트 동일 → 4번째 줄(고유키/빈 줄) → 같은 서명 재사용 여부. `sign_request` 스크립트의 `canonical` 출력과 한 줄씩 비교한다.
-3. `401 … outside the allowed window` → 시계·초 단위. `403 ip_not_allowed` → 나가는 IP 등록. `403 environment_unavailable` → 운영 키 사용(아직 운영 미오픈).
+3. `401 … outside the allowed window` → 시계·초 단위. `403 ip_not_allowed` → 나가는 IP 등록. `403 environment_unavailable` → 활성화되지 않은 운영 키 사용.
 4. `409 idempotency_key_reused` → 의도마다 새 키를 만드는지, 재시도만 같은 키인지. `409 request_in_progress` → 1초 뒤 같은 키.
 5. 업무 오류(409·422)는 `references/errors.md` 3절의 다음 행동을 따른다.
 

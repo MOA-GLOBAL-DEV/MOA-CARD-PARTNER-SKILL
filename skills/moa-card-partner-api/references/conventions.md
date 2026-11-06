@@ -1,6 +1,6 @@
 # 공통 규약: 형식·봉투·페이지·요청 추적·오류·본문 제한
 
-Base URL: `https://api.moacard.io/partner/v1` (HTTPS만). 테스트·운영이 같은 주소를 쓰고, 어느 환경인지는 API Key로 정해진다(`pk_test_` 테스트, `pk_live_` 운영). 운영 환경은 회사가 별도로 공지한 뒤 열린다(그 전에는 `403 environment_unavailable`).
+Base URL: `https://api.moacard.io/partner/v1` (HTTPS만). 테스트·운영이 같은 주소를 쓰고, 어느 환경인지는 API Key로 정해진다(`pk_test_` 테스트, `pk_live_` 운영). 활성화되지 않은 운영 키는 `403 environment_unavailable`.
 
 ## 1. 값 형식
 
@@ -124,8 +124,8 @@ do {
 
 | 환경 | API Key | 내용 |
 |---|---|---|
-| 테스트(먼저 제공) | `pk_test_…` / `sk_test_…` | 입금 확인·KYC 결과·카드 등록·활성화·결제를 모의로 처리. 실제 자산을 보내지 않는다. 테스트 전용 API(`test-environment.md`) 사용 가능 |
-| 운영(추후 오픈, 회사 공지) | `pk_live_…` / `sk_live_…` | 실제 카드 발급사와 연결. 열리기 전에는 `403 environment_unavailable` |
+| 테스트 | `pk_test_…` / `sk_test_…` | 입금 확인·KYC 결과·카드 등록·활성화·결제를 모의로 처리. 실제 자산을 보내지 않는다. 테스트 전용 API(`test-environment.md`) 사용 가능 |
+| 운영 | `pk_live_…` / `sk_live_…` | 실제 카드 발급사와 연결. 운영 키가 활성화되기 전에는 `403 environment_unavailable` |
 
 - 테스트·운영의 데이터(회원, 카드, 주문, 거래, 알림)는 섞이지 않는다. 테스트 키로 만든 회원은 운영 키로 조회되지 않는다.
 - 허용 IP·웹훅 주소·웹훅 서명 키는 환경별로 따로다.

@@ -1,6 +1,6 @@
 # 테스트 환경
 
-**지금 파트너사가 먼저 쓸 수 있는 환경은 테스트 환경(`pk_test_` 키)이다.** 운영 환경(`pk_live_`)은 회사가 별도로 공지한 뒤 열린다. 열리기 전에 운영 키로 부르면 `403 environment_unavailable`.
+테스트 환경(`pk_test_` 키)에서는 입금 확인·KYC 결과·카드 등록·결제를 모의로 처리한다. 운영 키(`pk_live_`)가 아직 활성화되지 않았으면 `403 environment_unavailable`.
 
 테스트와 운영은 같은 Base URL(`https://api.moacard.io/partner/v1`)을 쓰고, 키로 환경이 정해진다. 데이터는 섞이지 않는다.
 
@@ -148,7 +148,7 @@ TRON 지갑 주소 예(형식 확인용): `TExampLeMemberWa11etAddress1234567`(`
 - 결제 뒤 `refund`(원거래 지정) → `transaction.posted`, 잔액 복구
 - 웹훅 수신부를 일부러 5xx로 답하게 해 재전송(1분 뒤)과 `event_id` 중복 제거 확인
 
-## 6. 운영 전환 체크리스트(운영 오픈 공지 뒤)
+## 6. 운영 전환 체크리스트
 
 - 운영 키(`pk_live_`/`sk_live_`), 운영 허용 IP, 운영 웹훅 주소, 운영 웹훅 서명 키를 따로 받는다.
 - 웹훅 검증 키를 환경별로 고른다(`environment` 필드 기준).

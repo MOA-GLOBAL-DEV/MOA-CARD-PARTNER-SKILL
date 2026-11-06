@@ -224,7 +224,7 @@ public final class MoaSigner {
 | `401` + `X-Moa-Timestamp is outside the allowed window (±300 seconds).` | 서버 시계(NTP), 초 단위인지(밀리초 아님), 숫자만 넣었는지 |
 | `401` + `Invalid API key or signature.` | ① 키 ID·비밀키가 같은 환경의 짝인지 ② 키가 폐기·만료되지 않았는지 ③ 경로에 `/partner/v1`을 넣었는지 ④ 쿼리를 보낸 그대로 넣었는지 ⑤ 서명한 본문과 보낸 본문이 같은 바이트인지 ⑥ 4번째 줄에 보낸 고유키(GET은 빈 줄)를 넣었는지 ⑦ 같은 서명을 다시 보내지 않았는지(재시도·폴링 포함) |
 | `403 ip_not_allowed` | 그 환경의 허용 IP에 서버의 나가는 IP가 등록되어 있는지(`GET /ping`의 `client_ip`는 허용 IP에서만 보인다) |
-| `403 environment_unavailable` | 운영 키(`pk_live_`)를 쓰고 있는지. 운영 환경이 열리기 전에는 이 응답이다 |
+| `403 environment_unavailable` | 운영 키(`pk_live_`)가 아직 활성화되지 않았는지(회사 담당자에게 확인) |
 | `403 partner_suspended` | 회사 담당자에게 문의 |
 | `400` + `Idempotency-Key header is required for POST requests.` | POST(본문 없는 POST 포함)에 `Idempotency-Key`를 넣었는지 |
 | `400` + `Request body exceeds … bytes.` | 본문 64KB(KYC 서류 등록 4MB) 이하인지, `Content-Encoding`(gzip 등)을 붙이지 않았는지 |

@@ -10,7 +10,7 @@
 | 401 | `authentication_failed` | false | 키·서명·시각 오류, 같은 서명 재전송. 인증하지 않은 요청은 없는 경로도 401 | 인증에 실패했습니다. |
 | 403 | `ip_not_allowed` | false | 등록하지 않은 IP에서 호출 | 허용되지 않은 접속 위치입니다. |
 | 403 | `partner_suspended` | false | 이용 정지된 파트너사 | 서비스 이용이 일시 중지되었습니다. 고객센터에 문의해 주세요. |
-| 403 | `environment_unavailable` | false | 아직 열리지 않은 환경(운영) | 아직 이용할 수 없는 환경입니다. |
+| 403 | `environment_unavailable` | false | 활성화되지 않은 환경의 키(운영) | 아직 이용할 수 없는 환경입니다. |
 | 404 | `not_found` | false | 경로·대상 없음(운영 키로 테스트 API 호출, 없는 국가 코드 포함) | 요청한 정보를 찾을 수 없습니다. |
 | 404 | `member_not_found` | false | 회원 없음(다른 파트너사·환경의 회원 포함) | 회원 정보를 찾을 수 없습니다. |
 | 404 | `card_not_found` | false | 카드 없음 | 카드 정보를 찾을 수 없습니다. |
