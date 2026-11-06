@@ -237,7 +237,7 @@ credited_amount = round_half_up(amount, 0.01) − issuer_fee − company_fee
 | 125.50 | 1.26 (1.255) | 1.88 (1.8825) | 122.36 |
 
 - 실제 반영액은 **실제 입금액**으로 같은 식을 계산하고, 요율은 **주문 생성 시점** 값(주문의 `fees`)을 쓴다.
-- 충전 주문은 `amount_due`가 없다. 범위 밖 입금은 예외 입금. 반영액 0 이하 → `failed`(`amount_below_fees`) + `topup.failed`. 입금 뒤 카드가 차단·해지 → `failed`(`card_not_active`). `frozen` 카드는 충전된다.
+- 충전 주문은 `amount_due`가 없다. 범위 밖 입금은 예외 입금. 반영액 0 이하 → `failed`(`amount_below_fees`) + `topup.failed`, 받은 입금은 예외 입금으로 처리(자동 반환 없음). 입금 뒤 카드가 차단·해지 → `failed`(`card_not_active`). `frozen` 카드는 충전된다.
 - 충전 주문 생성은 카드 `active`에서만(아니면 `422 card_not_active`).
 - 파트너사 화면에서 계산하려면 decimal 연산으로 위 식을 그대로 구현하거나, `topup-quote`를 부른다.
 

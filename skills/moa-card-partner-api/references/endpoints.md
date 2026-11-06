@@ -527,7 +527,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 ```
 
 - 충전 주문은 `amount_due`가 없다(`null`). 회원은 `min_amount`~`max_amount` 안의 금액을 보낸다.
-- 반영액이 0 이하면 주문 `failed`(`failure_code: amount_below_fees`) + `topup.failed`. 입금 뒤 카드가 차단·해지되어 있으면 `failed`(`card_not_active`). 정지(`frozen`) 카드는 충전된다.
+- 반영액이 0 이하면 주문 `failed`(`failure_code: amount_below_fees`) + `topup.failed`. 받은 입금은 예외 입금으로 처리한다(자동 반환 없음). 입금 뒤 카드가 차단·해지되어 있으면 `failed`(`card_not_active`). 정지(`frozen`) 카드는 충전된다.
 
 오류: `422 card_not_active`, `422 unsupported_asset`, `422 wallet_address_invalid`, `409 order_in_progress`, `409 wallet_address_in_use`, `404 card_not_found`, `503 issuer_unavailable`.
 
