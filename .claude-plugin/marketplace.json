@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "moa-card-partner",
+  "description": "MOA 카드 파트너 API 연동용 Claude Code 플러그인",
+  "owner": {
+    "name": "MOA"
+  },
+  "plugins": [
+    {
+      "name": "moa-card-partner",
+      "description": "MOA 카드 파트너 API 연동 스킬: 요청 서명·멱등, 회원·KYC, 공카드 등록·활성화, 카드 관리, 충전, 거래, 웹훅, 테스트 환경",
+      "version": "1.0.0",
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/MOA-GLOBAL-DEV/MOA-CARD-PARTNER-SKILL"
+    }
+  ]
+}

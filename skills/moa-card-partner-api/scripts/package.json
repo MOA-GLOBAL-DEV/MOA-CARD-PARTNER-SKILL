@@ -1,0 +1,15 @@
+{
+  "name": "moa-card-partner-api-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MOA 카드 파트너 API 스킬의 보조 스크립트. jose는 jwe_pin.mjs에만 필요하다.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "self-test": "node sign_request.mjs --self-test && node verify_webhook.mjs --self-test && node partner_client.mjs --self-test && node jwe_pin.mjs --self-test"
+  },
+  "dependencies": {
+    "jose": "^6.0.0"
+  }
+}

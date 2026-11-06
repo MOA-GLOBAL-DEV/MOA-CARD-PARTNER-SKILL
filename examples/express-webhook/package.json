@@ -1,0 +1,16 @@
+{
+  "name": "moa-partner-express-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MOA 카드 파트너 API 연동 예제: 웹훅 수신 + API 호출(Express)",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
