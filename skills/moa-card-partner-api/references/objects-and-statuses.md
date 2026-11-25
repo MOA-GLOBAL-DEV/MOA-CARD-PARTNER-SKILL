@@ -42,10 +42,11 @@ KYC 공유 규칙(회원 = 이메일 단위):
 |---|---|---|
 | `product_id` | string | 카드 상품 ID |
 | `name` · `brand` | string | 상품 이름, 카드 브랜드(대문자) |
-| `activation_amount.min` · `max` | string | 공카드 등록 첫 입금의 범위(등록 수수료 제외). 최소 활성화 금액이 없으면 `min`은 `"0.00"`(이때 등록 주문의 `amount_due`는 등록 수수료와 같다). 최대값이 없으면 `max`는 `topup_amount.max`와 같다 |
+| `activation_amount.min` · `max` | string | 공카드 등록 때 카드 첫 잔액(수수료를 뗀 금액)의 범위. 최소 활성화 금액이 없으면 `min`은 `"0.00"`. 최대값이 없으면 `max`는 `topup_amount.max`와 같다 |
 | `topup_amount.min` · `max` | string | 충전 1회 입금액 범위(수수료 포함 입금액 기준) |
 | `supported_nationalities` | array | 이용 가능한 국적 코드. 정보가 없으면 `[]` |
 | `supported_regions` | array | 이용 가능한 지역 코드. 정보가 없으면 `[]` |
+| `fees.registration.issuer_percent` | string | 등록 입금에서 떼는 발급사 수수료율(%) |
 | `fees.registration.fixed` | string | 등록 수수료(USD, 계약) |
 | `fees.topup.issuer_percent` | string | 카드 발급사 충전 수수료율(%) |
 | `fees.topup.percent` · `fixed` | string | 회사 충전 수수료율(%)·고정액(USD, 계약) |
@@ -102,7 +103,7 @@ KYC 공유 규칙(회원 = 이메일 단위):
 | `min_amount` · `max_amount` | string \| null | 입금액 범위 |
 | `deposit_amount` | string \| null | 확인된 입금 자산 수량(소수 6자리) |
 | `deposit_tx_hash` | string \| null | 입금 트랜잭션 해시(테스트 환경은 `test_…`) |
-| `fee_amount` | string \| null | 처리 뒤 확정된 수수료 합계(등록 수수료 또는 충전 수수료) |
+| `fee_amount` | string \| null | 처리 뒤 확정된 수수료 합계(등록: 발급사 + 등록 수수료, 충전: 발급사 + 회사 수수료) |
 | `credited_amount` | string \| null | 카드에 반영된 금액 |
 | `fees` | object | 주문 생성 시점 요율. 등록 `{ registration_fee }`, 충전 `{ topup_fee_percent, topup_fee_fixed, issuer_fee_percent }` |
 | `failure_code` | string \| null | 실패 사유 코드(`status: failed`일 때) |

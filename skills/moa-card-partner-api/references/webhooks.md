@@ -162,8 +162,8 @@ def verify_moa_webhook(secret, signature_header, raw_body, tolerance_sec=300, no
   "order": {
     "order_id": "ord_01jbz4c8e2g4j6m8p0s2v4x6z8", "type": "registration", "member_id": "mem_01jbz2x7d5f9h3k6n8p0r2t4v6", "card_id": null,
     "status": "deposit_confirmed", "asset": "USDT", "network": "TRON", "deposit_address": "TEST-DEPOSIT-TRON", "wallet_address": "TExampLeMemberWa11etAddress1234567",
-    "amount_due": "120.00", "min_amount": "120.00", "max_amount": "1020.00", "deposit_amount": "125.500000", "deposit_tx_hash": "test_5f0c9a2e7b1d4c3a8e6f2b9d0a1c3e5f",
-    "fee_amount": null, "credited_amount": null, "fees": { "registration_fee": "20.00" }, "failure_code": null, "cancel_reason": null,
+    "amount_due": "121.21", "min_amount": "121.21", "max_amount": "1030.30", "deposit_amount": "125.500000", "deposit_tx_hash": "test_5f0c9a2e7b1d4c3a8e6f2b9d0a1c3e5f",
+    "fee_amount": null, "credited_amount": null, "fees": { "registration_fee": "20.00", "issuer_fee_percent": "1.0" }, "failure_code": null, "cancel_reason": null,
     "expires_at": "2026-11-06T02:40:00.000Z", "created_at": "2026-11-06T01:40:00.000Z", "updated_at": "2026-11-06T01:42:09.000Z", "completed_at": null
   }
 }
@@ -177,8 +177,8 @@ def verify_moa_webhook(secret, signature_header, raw_body, tolerance_sec=300, no
   "order": {
     "order_id": "ord_01jbz4c8e2g4j6m8p0s2v4x6z8", "type": "registration", "member_id": "mem_01jbz2x7d5f9h3k6n8p0r2t4v6", "card_id": "card_01jbz4d9f3h5k7n9q1t3w5y7a9",
     "status": "registered", "asset": "USDT", "network": "TRON", "deposit_address": "TEST-DEPOSIT-TRON", "wallet_address": "TExampLeMemberWa11etAddress1234567",
-    "amount_due": "120.00", "min_amount": "120.00", "max_amount": "1020.00", "deposit_amount": "125.500000", "deposit_tx_hash": "test_5f0c9a2e7b1d4c3a8e6f2b9d0a1c3e5f",
-    "fee_amount": "20.00", "credited_amount": "105.50", "fees": { "registration_fee": "20.00" }, "failure_code": null, "cancel_reason": null,
+    "amount_due": "121.21", "min_amount": "121.21", "max_amount": "1030.30", "deposit_amount": "125.500000", "deposit_tx_hash": "test_5f0c9a2e7b1d4c3a8e6f2b9d0a1c3e5f",
+    "fee_amount": "21.26", "credited_amount": "104.24", "fees": { "registration_fee": "20.00", "issuer_fee_percent": "1.0" }, "failure_code": null, "cancel_reason": null,
     "expires_at": "2026-11-06T02:40:00.000Z", "created_at": "2026-11-06T01:40:00.000Z", "updated_at": "2026-11-06T01:42:10.000Z", "completed_at": "2026-11-06T01:42:10.000Z"
   },
   "card": { "card_id": "card_01jbz4d9f3h5k7n9q1t3w5y7a9", "member_id": "mem_01jbz2x7d5f9h3k6n8p0r2t4v6", "product_id": "111100", "masked_number": "999999****5670", "status": "inactive", "created_at": "2026-11-06T01:42:10.000Z", "activated_at": null }

@@ -283,7 +283,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
     "supported_nationalities": ["KR", "JP", "SG"],
     "supported_regions": ["KR", "JP", "SG"],
     "fees": {
-      "registration": { "fixed": "20.00" },
+      "registration": { "issuer_percent": "1.0", "fixed": "20.00" },
       "topup": { "issuer_percent": "1.0", "percent": "1.5", "fixed": "0.00" },
       "payment": { "percent": "1.2", "fixed": "0.00" },
       "atm": { "percent": "2.0", "fixed": "2.50" }
@@ -332,9 +332,9 @@ KYC를 받는 국가(이름순). 페이지 없음.
   "network": "TRON",
   "deposit_address": "TEST-DEPOSIT-TRON",
   "wallet_address": "TExampLeMemberWa11etAddress1234567",
-  "amount_due": "120.00",
-  "min_amount": "120.00",
-  "max_amount": "1020.00",
+  "amount_due": "121.21",
+  "min_amount": "121.21",
+  "max_amount": "1030.30",
   "deposit_amount": null,
   "deposit_tx_hash": null,
   "fee_amount": null,
@@ -349,7 +349,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 }
 ```
 
-- `amount_due` = `min_amount` = 상품 `activation_amount.min` + 등록 수수료. `max_amount` = `activation_amount.max` + 등록 수수료.
+- 카드 첫 잔액 = 입금액 − 발급사 수수료(입금액 × `issuer_fee_percent`, half-up) − 등록 수수료. `amount_due` = `min_amount`는 잔액이 `activation_amount.min` 이상인 가장 작은 입금, `max_amount`는 `activation_amount.max` 이하인 가장 큰 입금(예: 최소 100·최대 1,000, 발급사 1.0%, 등록 20 → 121.21·1030.30). `fees`에 `registration_fee`·`issuer_fee_percent`.
 - 유효기간 60분(`expires_at`). 회원에게 입금 주소·자산·네트워크·`amount_due`·유효기간을 안내한다. 예시의 `deposit_address`는 테스트 자리표시 값.
 - 카드 번호 원문은 저장되지 않는다(가린 번호·참조값만).
 
@@ -431,7 +431,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 ### 22. GET /cards/{card_id}/balance — 잔액
 
 ```json
-{ "card_id": "card_01jbz4d9f3h5k7n9q1t3w5y7a9", "available_balance": "190.70", "currency": "USD", "updated_at": "2026-11-06T02:05:12.000Z" }
+{ "card_id": "card_01jbz4d9f3h5k7n9q1t3w5y7a9", "available_balance": "189.44", "currency": "USD", "updated_at": "2026-11-06T02:05:12.000Z" }
 ```
 
 오류: `404 card_not_found`.

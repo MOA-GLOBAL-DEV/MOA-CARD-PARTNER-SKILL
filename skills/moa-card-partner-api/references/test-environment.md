@@ -56,7 +56,7 @@
 
 - `amount`는 입금 자산 수량(소수 6자리까지). `wallet_address`가 없으면 주문의 지갑 주소(다른 값을 넣어 예외 입금 시험).
 - 자산·네트워크·입금 주소는 주문 값을 쓴다.
-- 등록 주문: `deposit_confirmed` → `registered`(카드 `inactive` 생성, `card_id` 채워짐, 잔액 = 입금액 − 등록 수수료). 알림 `order.deposit_confirmed` → `card.registered`.
+- 등록 주문: `deposit_confirmed` → `registered`(카드 `inactive` 생성, `card_id` 채워짐, 잔액 = 입금액 − 발급사 수수료 − 등록 수수료). 알림 `order.deposit_confirmed` → `card.registered`.
 - 충전 주문: `deposit_confirmed` → `completed`(반영액 = 입금액 − 수수료). 알림 `order.deposit_confirmed` → `topup.completed`. 반영액 0 이하면 `failed`(`amount_below_fees`) + `topup.failed`, 카드가 차단·해지면 `failed`(`card_not_active`).
 - 조건이 맞지 않으면 예외 입금으로 보고 **주문은 그대로** `422 deposit_not_matched`. `error.details.reason`:
 
@@ -107,7 +107,7 @@
 
 ## 5. 전체 시나리오
 
-금액은 예시 이용 조건(최소 활성화 100.00, 등록 수수료 20.00, 충전 수수료 발급사 1.0%·회사 1.5% + 0.00) 기준이다. 실제 값은 `GET /products`를 따른다.
+금액은 예시 이용 조건(최소 활성화 100.00, 등록 수수료 20.00, 발급사 1.0%(등록·충전), 회사 충전 1.5% + 0.00) 기준이다. 실제 값은 `GET /products`를 따른다.
 
 | 단계 | 요청 | 확인할 결과 | 알림 |
 |---|---|---|---|
@@ -119,15 +119,15 @@
 | 6 | `POST /members/{member_id}/kyc`(`endpoints.md` 11번 본문, 도시는 도시 API 코드) | `202`, `status: in_review` | — |
 | 7 | `POST /test/members/{member_id}/kyc-result` `{ "result": "approved" }` | `200`, `status: approved` | `kyc.approved` |
 | 8 | `GET /test/card-inventory` | `status: available`인 공카드 번호 | — |
-| 9 | `POST /members/{member_id}/registration-orders` `{ card_number, "asset": "USDT", "network": "TRON", wallet_address }` | `201`, `amount_due: "120.00"`, `deposit_address: "TEST-DEPOSIT-TRON"` | — |
-| 10 | `POST /test/orders/{order_id}/deposit` `{ "amount": "125.50" }` | `200`, `status: registered`, `credited_amount: "105.50"`, `card_id` | `order.deposit_confirmed`, `card.registered` |
+| 9 | `POST /members/{member_id}/registration-orders` `{ card_number, "asset": "USDT", "network": "TRON", wallet_address }` | `201`, `amount_due: "121.21"`, `deposit_address: "TEST-DEPOSIT-TRON"` | — |
+| 10 | `POST /test/orders/{order_id}/deposit` `{ "amount": "125.50" }` | `200`, `status: registered`, `credited_amount: "104.24"`, `card_id` | `order.deposit_confirmed`, `card.registered` |
 | 11 | `POST /cards/{card_id}/activate` `{ "activation_code": "123456", "encrypted_pin": "<JWE>" }` | `200`, `status: active` | `card.activated` |
 | 12 | `GET /cards/{card_id}/topup-quote?amount=100.00` | `credited_amount: "97.50"` | — |
 | 13 | `POST /cards/{card_id}/topup-orders` `{ "asset": "USDT", "network": "TRON", wallet_address }` | `201`, `type: topup` | — |
 | 14 | `POST /test/orders/{order_id}/deposit` `{ "amount": "100.00" }` | `200`, `status: completed`, `credited_amount: "97.50"` | `order.deposit_confirmed`, `topup.completed` |
-| 15 | `GET /cards/{card_id}/balance` | `available_balance: "203.00"` | — |
+| 15 | `GET /cards/{card_id}/balance` | `available_balance: "201.74"` | — |
 | 16 | `POST /test/cards/{card_id}/transactions` `{ "type": "payment", "amount": "12.30" }` | `201`, `status: approved` | `authorization.approved` |
-| 17 | `GET /cards/{card_id}/balance` | `available_balance: "190.70"` | — |
+| 17 | `GET /cards/{card_id}/balance` | `available_balance: "189.44"` | — |
 | 18 | `GET /events?type=card.activated,topup.completed` | 알림과 `delivery.status` | — |
 | 19 | `GET /transactions?card_id={card_id}&type=payment,reversal,refund,adjustment` | 16의 결제 | — |
 
