@@ -55,7 +55,7 @@ description: "MOA 카드 파트너 API(api.moacard.io/partner/v1) 연동·디버
 ## 핵심 흐름 요약
 
 - **온보딩**: `POST /members` → `POST /members/{id}/email-verification` → `POST …/email-verification/confirm`(`linked`) → `GET /members/{id}/kyc`가 `approved`가 아니면 `POST …/kyc/documents`×3 + `POST …/kyc` → `kyc.approved`/`kyc.rejected` 웹훅. 모든 회원이 이메일 인증을 해야 KYC·카드 등록을 할 수 있다.
-- **공카드 등록**: `POST /members/{id}/registration-orders`(`card_number`, `asset`, `network`, 회원 `wallet_address`) → 회원이 그 지갑에서 `deposit_address`로 `amount_due`~`max_amount` 입금(60분 안, 만료 시 웹훅 없음) → `order.deposit_confirmed` → `card.registered`(카드 `inactive`) → `POST /cards/{id}/activate`(`activation_code`, 앱이 만든 `encrypted_pin`) → `card.activated`.
+- **공카드 등록**: `POST /members/{id}/registration-orders`(`card_number`, `asset`, `network`, 회원 `wallet_address`) → 회원이 그 지갑에서 `deposit_address`로 `amount_due`~`max_amount` 입금(60분 안, 만료 시 웹훅 없음) → `order.deposit_confirmed` → `card.registered`(카드 `inactive`) → `POST /cards/{id}/activate`(`activation_code`, 앱이 만든 `encrypted_pin`) → `card.activated`. 회원이 코드 메일을 못 받으면 `POST /cards/{id}/activation-code/resend`(같은 코드, 1분·하루 5번).
 - **충전**: `GET /cards/{id}/topup-quote?amount=` → `POST /cards/{id}/topup-orders` → 입금 → `topup.completed`. 회원별 진행 중 주문은 등록·충전 합쳐 1건.
 - **카드 관리**: 조회·잔액, `freeze`/`unfreeze`(`card.status_changed`), `sensitive`(JWE), `pin-verification` → `pin`.
 - **거래**: `GET /transactions?card_id=&type=payment,reversal,refund,adjustment`, 웹훅 `authorization.*`·`transaction.posted`.

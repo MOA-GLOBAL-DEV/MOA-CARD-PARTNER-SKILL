@@ -1,4 +1,4 @@
-# 엔드포인트 전체(41개)
+# 엔드포인트 전체(42개)
 
 - 경로는 Base URL `https://api.moacard.io/partner/v1` 뒤의 부분이다. **서명 원문에는 `/partner/v1`부터** 쓴다.
 - 모든 POST는 `Idempotency-Key`가 필요하다(본문 없는 POST 포함). "본문 없음"인 POST는 본문을 비워 보낸다.
@@ -30,6 +30,7 @@
 | 17 | GET | `/registration-orders/{order_id}` | 등록 주문 조회 | 200 |
 | 18 | POST | `/registration-orders/{order_id}/cancel` | 등록 주문 취소 | 200 |
 | 19 | POST | `/cards/{card_id}/activate` | 카드 활성화 | 200 |
+| 19-1 | POST | `/cards/{card_id}/activation-code/resend` | 활성화 코드 재발송 | 200 |
 | 20 | GET | `/members/{member_id}/cards` | 회원의 카드 목록 | 200 |
 | 21 | GET | `/cards/{card_id}` | 카드 조회 | 200 |
 | 22 | GET | `/cards/{card_id}/balance` | 잔액 조회 | 200 |
@@ -311,7 +312,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 |---|---|---|---|
 | `card_number` | string | Y | 숫자 13~19자리(공백·하이픈 없이) |
 | `asset` | string | Y | 1~20자, 대소문자 무관(대문자로 바꿈). `GET /topup/options`에 있어야 함(없으면 `422 unsupported_asset`) |
-| `network` | string | Y | `asset`과 같은 규칙 |
+| `network` | string | Y | `asset`과 같은 규칙. 토큰 규격 표기도 받는다(`TRC20` → `TRON`, `ERC20` → `ETH`, `BEP20` → `BSC`) |
 | `wallet_address` | string | Y | 1~128자 + 네트워크 형식(아니면 `422 wallet_address_invalid`): EVM(ETH·ARBITRUM·BSC·BASE·POL·AVAXC 등) `0x`+16진수 40자리(대소문자 무관), TRON `T`로 시작하는 base58 34자리, Solana(SOL) base58 32~44자리 |
 
 ```json
@@ -391,6 +392,21 @@ KYC를 받는 국가(이름순). 페이지 없음.
 - 활성화 코드는 카드당 24시간에 5번까지. **다섯 번째로 틀리면 `422 verification_locked`**, 24시간 동안 맞는 코드도 거절.
 
 오류: `422 pin_invalid`, `422 invalid_activation_code`, `422 verification_locked`, `409 invalid_state`(`inactive` 아님), `404 card_not_found`, `503 issuer_unavailable`(같은 키로 재시도).
+
+### 19-1. POST /cards/{card_id}/activation-code/resend — 활성화 코드 재발송
+
+본문 없음. 회원이 활성화 코드 메일을 받지 못했을 때 쓴다.
+
+```json
+{ "card_id": "card_01jbz4d9f3h5k7n9q1t3w5y7a9", "sent_to": "u***@example.com" }
+```
+
+- 회원 이메일(인증한 주소)로 **처음과 같은 코드**를 다시 보낸다(새 코드 아님). 알림(웹훅) 없음.
+- 카드가 `inactive`일 때만. 카드당 1분에 한 번, 하루(UTC) 5번까지(넘으면 `429 rate_limited` + `Retry-After`, 하루 한도는 다음 UTC 자정까지).
+- 재발송해도 19번의 활성화 코드 시도 횟수(24시간 5번)는 줄지 않는다.
+- 테스트 환경: 메일 없이 같은 응답(코드는 늘 `123456`), 횟수 제한은 같다.
+
+오류: `409 invalid_state`(`inactive` 아님), `409 activation_code_not_ready`(운영만: 등록 직후 발급사가 아직 코드를 보내지 않음, `retryable: true` → 잠시 뒤 다시), `429 rate_limited`, `404 card_not_found`.
 
 ### 20. GET /members/{member_id}/cards — 회원의 카드
 

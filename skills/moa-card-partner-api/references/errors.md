@@ -28,6 +28,7 @@
 | 409 | `invalid_state` | false | 현재 상태에서 할 수 없는 요청(카드·주문 상태, 이미 `linked`인 회원의 인증, 허용 상품 없음 등) | 현재 상태에서는 요청을 처리할 수 없습니다. |
 | 409 | `idempotency_key_reused` | false | 같은 요청 고유키에 다른 경로·본문 | 요청을 처리할 수 없습니다. 다시 시도해 주세요. |
 | 409 | `request_in_progress` | **true** | 같은 요청 고유키의 요청이 처리 중(`Retry-After: 1`), 같은 회원 동시 등록 | 요청을 처리하고 있습니다. 잠시 후 다시 확인해 주세요. |
+| 409 | `activation_code_not_ready` | **true** | 활성화 코드 재발송(19-1) 때 카드 발급사가 아직 코드를 보내지 않음(운영만) | 활성화 코드가 아직 발급되지 않았습니다. 잠시 후 다시 시도해 주세요. |
 | 422 | `kyc_not_approved` | false | 그 카드 상품의 KYC가 승인되지 않음 | KYC 승인 후 카드를 등록할 수 있습니다. |
 | 422 | `card_not_assigned` | false | 파트너사에 공급되지 않은 공카드이거나 허용되지 않은 상품 | 등록할 수 없는 카드 번호입니다. |
 | 422 | `card_not_active` | false | 활성 상태가 아닌 카드(충전 주문) | 활성화된 카드에서만 이용할 수 있습니다. |
@@ -56,7 +57,7 @@
 | 상황 | 권장 처리 |
 |---|---|
 | 응답을 받지 못함(타임아웃·연결 끊김) | POST는 같은 요청 고유키로, GET은 그대로 다시. 모두 새 시각으로 서명 |
-| `retryable: true`(`409 request_in_progress`, `429`, `500`, `503`) | `Retry-After`가 있으면 그만큼, 없으면 지수 백오프(1·2·4초…). POST는 같은 고유키 + 새 시각·서명. 하루 한도처럼 `Retry-After`가 길면 회원에게 안내하고 자동 재시도하지 않는다 |
+| `retryable: true`(`409 request_in_progress`, `409 activation_code_not_ready`, `429`, `500`, `503`) | `Retry-After`가 있으면 그만큼, 없으면 지수 백오프(1·2·4초…). POST는 같은 고유키 + 새 시각·서명. 하루 한도처럼 `Retry-After`가 길면 회원에게 안내하고 자동 재시도하지 않는다 |
 | `401 authentication_failed` | 재시도하지 않는다. `auth-and-signing.md` 10절 점검표 |
 | `403` | 재시도하지 않는다. IP 등록·환경·계약 상태를 확인 |
 | `400 invalid_request` | 재시도하지 않는다. `details` 키로 틀린 입력을 찾아 고친 뒤 **새 고유키**로 |
@@ -90,4 +91,5 @@
 | `public_key_invalid` | 앱이 SPKI PEM(`BEGIN PUBLIC KEY`) RSA 2048+로 보내는지(iOS는 PKCS#1에 SPKI 헤더 추가) |
 | `idempotency_key_reused` | 코드 버그 신호. 의도마다 새 키를 만들고, 재시도에만 같은 키를 쓰는지 점검 |
 | `request_in_progress` | 1초 뒤 같은 키로 다시(처음 결과를 받게 됨) |
+| `activation_code_not_ready` | 등록 직후다. 30초쯤 뒤 새 요청 고유키로 다시 재발송 |
 | `deposit_not_matched`(테스트) | `details.reason`에 맞게 테스트 입금 값을 고친다(`test-environment.md`) |

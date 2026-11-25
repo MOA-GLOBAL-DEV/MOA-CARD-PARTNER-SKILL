@@ -2,7 +2,7 @@
 
 MOA 카드 파트너 API를 연동하는 파트너사 개발자를 위한 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) / Agent Skills 스킬이다. Claude가 파트너사 서버 코드에 요청 서명, 멱등 처리, 회원·이메일 인증·KYC, 실물 공카드 등록·활성화(JWE PIN), 카드 관리, 충전, 거래 내역, 웹훅 수신을 구현하거나 오류를 고칠 때 이 스킬의 규칙과 명세를 따른다.
 
-- 명세 기준: 파트너 API 연동 가이드 v1.0
+- 명세 기준: 파트너 API 연동 가이드 v1.1
 - Base URL: `https://api.moacard.io/partner/v1`
 
 ## 이용 가능 환경

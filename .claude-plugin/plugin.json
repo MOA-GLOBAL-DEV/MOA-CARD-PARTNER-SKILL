@@ -1,6 +1,6 @@
 {
   "name": "moa-card-partner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MOA 카드 파트너 API 연동 스킬: 요청 서명·멱등, 회원·이메일 인증·KYC, 공카드 등록·활성화(JWE PIN), 카드 관리, 충전, 거래, 웹훅, 테스트 환경 시나리오",
   "author": {
     "name": "MOA"

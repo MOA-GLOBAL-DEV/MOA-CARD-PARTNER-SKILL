@@ -96,6 +96,7 @@ PIN 암호화 규칙:
 - 다른 알고리즘·압축·6자리 숫자가 아닌 PIN은 모두 `422 pin_invalid`. 서버는 `encrypted_pin`을 먼저 확인하고 그다음 활성화 코드를 본다.
 - 파트너 서버는 PIN을 볼 수 없고, `encrypted_pin`도 저장·로그하지 않는다.
 - 활성화 코드는 카드당 24시간에 5번까지(다섯 번째 오류 `422 verification_locked`).
+- 회원이 활성화 코드 메일을 받지 못하면 `POST /cards/{card_id}/activation-code/resend`로 같은 코드를 다시 보낸다(1분에 한 번, 하루 5번. `endpoints.md` 19-1).
 
 JavaScript(브라우저·React Native, `jose` 6.x) — `scripts/jwe_pin.mjs`의 `encryptPin`과 같다:
 
@@ -260,7 +261,7 @@ credited_amount = round_half_up(amount, 0.01) − issuer_fee − company_fee
 | 상황 | 처리 |
 |---|---|
 | 응답 없음(타임아웃·연결 끊김) | POST는 **같은 Idempotency-Key**로, GET은 그대로 다시. 모두 새 시각으로 서명 |
-| `retryable: true`(`409 request_in_progress`, `429`, `500`, `503`) | `Retry-After`가 있으면 그만큼, 없으면 1초·2초·4초… 백오프 후 같은 키로 재시도 |
+| `retryable: true`(`409 request_in_progress`, `409 activation_code_not_ready`, `429`, `500`, `503`) | `Retry-After`가 있으면 그만큼, 없으면 1초·2초·4초… 백오프 후 같은 키로 재시도 |
 | `401 authentication_failed` | 재시도하지 않는다. `auth-and-signing.md` 10절 점검표 |
 | `400 invalid_request` | 재시도하지 않는다. `details`로 입력을 고친 뒤 **새 키**로 |
 | `409`·`422` 업무 오류 | 회원에게 `user_message`를 보여 주고, 상태를 조회해 다음 행동을 정한다(`errors.md`) |
