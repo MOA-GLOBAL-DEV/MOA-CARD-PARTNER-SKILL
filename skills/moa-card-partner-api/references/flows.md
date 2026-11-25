@@ -95,7 +95,7 @@ PIN 암호화 규칙:
 - `kid`가 있으면 현재 `key_id`와 같아야 한다(다르면 `422 pin_invalid`). 공개키는 캐시해도 되지만 `key_id`가 바뀌면 다시 받는다.
 - 다른 알고리즘·압축·6자리 숫자가 아닌 PIN은 모두 `422 pin_invalid`. 서버는 `encrypted_pin`을 먼저 확인하고 그다음 활성화 코드를 본다.
 - 파트너 서버는 PIN을 볼 수 없고, `encrypted_pin`도 저장·로그하지 않는다.
-- 활성화 코드는 카드당 24시간에 5번까지(다섯 번째 오류 `422 verification_locked`).
+- 활성화 코드는 카드당 5번까지 시도(맞으면 초기화, 발급사 오류로 끝난 시도도 셈). 다섯 번째가 틀리면 `422 verification_locked`, 첫 시도부터 24시간 잠김.
 - 회원이 활성화 코드 메일을 받지 못하면 `POST /cards/{card_id}/activation-code/resend`로 같은 코드를 다시 보낸다(1분에 한 번, 하루 5번. `endpoints.md` 19-1).
 
 JavaScript(브라우저·React Native, `jose` 6.x) — `scripts/jwe_pin.mjs`의 `encryptPin`과 같다:
@@ -194,7 +194,7 @@ export async function decryptCardDetails(encrypted, privateKey) {
 
 - Android: `KeyPairGenerator.getInstance("RSA")`(2048)의 공개키 `encoded`가 SPKI DER → base64 + PEM 머리·꼬리. 복호화는 Nimbus `JWEObject.parse(encrypted)` + `RSADecrypter(privateKey)`. Android Keystore 키는 OAEP MGF1(SHA-256) 지원을 대상 OS에서 확인.
 - iOS: `SecKeyCreateRandomKey`(RSA 2048). `SecKeyCopyExternalRepresentation`의 공개키는 PKCS#1이므로 **SPKI 헤더를 붙여** PEM으로 보낸다(그대로 보내면 `422 public_key_invalid`). 복호화는 JOSESwift `Decrypter(keyManagementAlgorithm: .RSAOAEP256, contentEncryptionAlgorithm: .A256GCM, decryptionKey:)`.
-- 카드별 시간당 10번(`429 rate_limited`). 카드 `active`·`frozen`만.
+- 카드별 시간당 10번(매시 정각 UTC에 초기화, 넘으면 `429 rate_limited` + 다음 정각까지 `Retry-After`). 카드 `active`·`frozen`만.
 
 ## 5. PIN 변경
 
@@ -247,7 +247,7 @@ credited_amount = round_half_up(amount, 0.01) − issuer_fee − company_fee
 - 결제·취소·환불·조정: `GET /transactions?card_id=…&type=payment,reversal,refund,adjustment`. ATM: `type=atm_withdrawal`.
 - 정렬·`from`/`to`는 `created_at` 기준. 화면 표시 시각은 `occurred_at`.
 - 실시간 반영은 웹훅: 승인·거절 `authorization.approved`/`authorization.declined`, 정산·환불·취소·수수료·조정 `transaction.posted`.
-- 원거래 화면: 같은 카드 거래 중 `original_transaction_id`가 원거래 ID인 항목을 묶는다. 원거래 전액 승인 취소 시 원거래 `status`가 `reversed`.
+- 원거래 화면: 같은 카드 거래 중 `original_transaction_id`가 원거래 ID인 항목을 묶는다. 원거래의 남은 금액을 모두 승인 취소하면 원거래 `status`가 `reversed`.
 - 잔액은 `GET /cards/{card_id}/balance`(Card 객체에는 없다).
 
 ## 9. 상태 동기화 전략(웹훅 + 조회)

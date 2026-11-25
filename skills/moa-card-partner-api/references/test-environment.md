@@ -16,7 +16,7 @@
 | 입금 주소 | `TEST-DEPOSIT-<NETWORK>`(예: `TEST-DEPOSIT-TRON`, `TEST-DEPOSIT-BASE`). **실제로 보낼 수 없는 자리표시 값. 실제 자산을 보내지 않는다** |
 | 입금 | 테스트 API로만 만든다 |
 | 공카드 | 회사가 만든 모의 번호(`999999`로 시작하는 16자리). `GET /test/card-inventory`로 확인 |
-| 카드 잔액·거래 | 테스트 거래 API로 만든 모의 거래만 반영 |
+| 카드 잔액·거래 | 잔액 = 등록·충전 반영액 ± 테스트 거래. 거래 내역에는 테스트 거래 API로 만든 모의 거래만 |
 | 시도 제한·레이트리밋 | 운영과 같다 |
 | 알림 | 운영과 같은 형식(`environment: "test"`). `card.activation_failed`는 발생하지 않는다(틀린 활성화 코드는 API 오류) |
 | `deposit_tx_hash` | `test_…` 모의 값 |
@@ -25,7 +25,7 @@
 
 ## 2. 테스트 전용 API
 
-`pk_test_` 키에서만 동작한다(운영 키는 `404 not_found`). POST에는 다른 API처럼 `Idempotency-Key`가 필요하다. 필드 제약은 `endpoints.md` 37~41번.
+`pk_test_` 키에서만 동작한다(운영 키는 `404 not_found`, 운영 환경이 열리기 전에는 먼저 `403 environment_unavailable`). POST에는 다른 API처럼 `Idempotency-Key`가 필요하다. 필드 제약은 `endpoints.md` 37~41번.
 
 | API | 동작 |
 |---|---|
@@ -45,7 +45,7 @@
 - 이메일 인증을 마친 회원만(`409 member_verification_required`).
 - `product_id`가 없으면 허용 상품 전부. 허용되지 않은 상품이면 `400`.
 - 거절이면 `reject_reason_code: "simulated"`, `reject_reason`은 `reason`(없으면 `"Rejected in the test environment."`).
-- 이 파트너사가 낸 신청의 결과만 바꾼다. 다른 경로로 승인된 같은 신원이 있으면 응답에서 승인으로 보인다.
+- KYC 신청 여부와 상관없이 이 파트너사 경로의 결과를 만든다(다른 파트너사의 결과는 바꾸지 않는다). 다른 경로로 승인된 같은 신원이 있으면 응답에서 승인으로 보인다.
 
 ### 2.2 테스트 입금 `POST /test/orders/{order_id}/deposit`
 
@@ -81,7 +81,7 @@
 
 - `payment`·`atm_withdrawal`: 승인·정산이면 잔액에서 `amount` + `fee`를 뺀다. 잔액이 모자라거나 카드가 `active`가 아니면 `declined`(잔액 그대로). 알림 `authorization.approved`/`authorization.declined`, `status: settled`로 만들면 `transaction.posted`. `original_transaction_id`는 넣을 수 없다.
 - 가맹점을 비우면 결제는 `TEST MERCHANT`·MCC `5999`·`US`, ATM은 `TEST ATM`·MCC `6011`·`US`. ATM의 MCC는 `6010`·`6011`만.
-- `reversal`·`refund`: 같은 카드의 승인·정산된 결제(ATM 포함)를 `original_transaction_id`로(필수). 다른 카드의 거래면 `404 transaction_not_found`, 거절·취소된 원거래면 `409 invalid_state`. 원거래에서 이미 취소·환불된 금액을 뺀 만큼까지 받고(넘으면 `400`) 잔액을 되돌린다(`settled`, `transaction.posted`). 가맹점은 원거래 값. 취소가 원거래 전액이 되면 원거래는 `reversed`.
+- `reversal`·`refund`: 같은 카드의 승인·정산된 결제(ATM 포함)를 `original_transaction_id`로(필수). 다른 카드의 거래면 `404 transaction_not_found`, 거절·취소된 원거래면 `409 invalid_state`. 원거래에서 이미 취소·환불된 금액을 뺀 만큼까지 받고(넘으면 `400`) 잔액을 되돌린다(`settled`, `transaction.posted`). 가맹점은 원거래 값. 승인 취소가 그 남은 금액 전부이면 원거래는 `reversed`.
 - `adjustment`(부호 있는 금액, 0 불가)·`fee`(차감): `settled`, `transaction.posted`. 잔액이 모자라도 반영한다.
 - `status`는 `payment`·`atm_withdrawal`만 `approved`(기본)·`declined`·`settled`, 그 밖은 `settled`만. `fee`는 `payment`·`atm_withdrawal`만.
 

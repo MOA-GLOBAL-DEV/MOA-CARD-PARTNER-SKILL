@@ -1,6 +1,6 @@
 # 객체와 상태값
 
-금액은 모두 문자열(USD 소수 2자리, `deposit_amount`만 소수 6자리), 시각은 ISO 8601 UTC 문자열. 값이 없으면 필드를 빼지 않고 `null`. 응답에 필드가 추가될 수 있으므로 모르는 필드는 무시한다.
+금액은 모두 문자열(USD 소수 2자리, `deposit_amount`만 소수 6자리), 시각은 ISO 8601 UTC 문자열. `data` 객체의 정해진 필드는 값이 없어도 빼지 않고 `null`(오류의 `details`, 주문 `fees`처럼 종류마다 키가 다른 객체는 예외). 응답에 필드가 추가될 수 있으므로 모르는 필드는 무시한다.
 
 ## Member
 
@@ -159,9 +159,9 @@ KYC 공유 규칙(회원 = 이메일 단위):
 | `approved` | 승인 | 승인되어 잔액에서 빠졌다(정산 전) |
 | `declined` | 거절 | 거절(잔액 변화 없음) |
 | `settled` | 정산 | 정산 완료. 취소·환불·조정·수수료는 정산 상태로 기록된다 |
-| `reversed` | 취소됨 | 원거래 전액이 승인 취소되었다 |
+| `reversed` | 취소됨 | 원거래의 남은 금액(이미 취소·환불된 금액을 뺀 금액)이 모두 승인 취소되었다 |
 
-원거래 연결: `reversal`·`refund`·`adjustment`는 `original_transaction_id`로 원거래와 연결된다. 원거래 화면에서 연결 거래를 보이려면 같은 카드의 거래 목록에서 `original_transaction_id`가 원거래 ID인 항목을 찾는다. 원거래 전액이 승인 취소되면 원거래 `status`가 `reversed`로 바뀐다.
+원거래 연결: `reversal`·`refund`·`adjustment`는 `original_transaction_id`로 원거래와 연결된다. 원거래 화면에서 연결 거래를 보이려면 같은 카드의 거래 목록에서 `original_transaction_id`가 원거래 ID인 항목을 찾는다. 원거래의 남은 금액(이미 취소·환불된 금액을 뺀 금액)을 모두 승인 취소하면 원거래 `status`가 `reversed`로 바뀐다.
 
 ## Event(`GET /events`)
 

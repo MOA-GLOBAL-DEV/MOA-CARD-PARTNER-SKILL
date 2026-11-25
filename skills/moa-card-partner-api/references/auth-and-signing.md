@@ -173,7 +173,8 @@ public final class MoaSigner {
 |---|---|
 | 같은 키 + 같은 요청(경로·본문), 처음 요청이 끝남 | 처음 응답(상태 코드·본문)을 그대로. `Idempotent-Replayed: true`. 본문의 `request_id`는 처음 값, `X-Request-Id`는 이번 값 |
 | 위와 같으나 회원 이메일이 든 성공 응답(`POST /members`, `POST …/email-verification/confirm`) | 상태 코드·처음 `request_id`는 같고 **`data`는 `null`**. `GET /members/{member_id}`로 다시 읽는다 |
-| 처음 요청이 4xx로 끝남 | 같은 4xx를 그대로. 입력을 고쳐 다시 보내려면 **새 키** |
+| 처음 요청이 4xx로 끝남(`retryable: false`) | 같은 4xx를 그대로. 입력을 고쳐 다시 보내려면 **새 키** |
+| 처음 요청이 `retryable: true`인 4xx로 끝남(`409 request_in_progress`·`activation_code_not_ready`, `429`) | 저장하지 않는다. `Retry-After`만큼 기다린 뒤 같은 키로 다시 보내면 다시 처리 |
 | 처음 요청이 5xx로 끝남 | 같은 키로 다시 보내면 다시 처리 |
 | 같은 키에 다른 경로·본문 | `409 idempotency_key_reused` |
 | 처음 요청이 아직 처리 중 | `409 request_in_progress`(`retryable: true`, `Retry-After: 1`) |
@@ -199,8 +200,10 @@ public final class MoaSigner {
 | 파트너사 전체(환경별, 모든 키 합산) | 초당 40회 | `429 rate_limited`, `Retry-After: 1` |
 | 접속 IP별(회사 네트워크 앞단) | 초당 10회(순간 20회), 동시 연결 20개 | `429`(**JSON 본문 없음**) |
 | 인증번호 요청(이메일 인증, PIN 변경) | 대상별 1분에 1번, 하루(UTC) 5번 | `429 rate_limited`, `Retry-After` |
-| 인증번호·활성화 코드 입력 | 대상별 24시간에 5번까지 틀릴 수 있음 | `422 verification_locked` |
-| 카드 상세정보 조회 | 카드별 시간당 10번 | `429 rate_limited`, `Retry-After` |
+| 활성화 코드 재발송 | 카드별 1분에 1번, 하루(UTC) 5번 | `429 rate_limited`, `Retry-After` |
+| 인증번호 입력 | 대상별 5번까지 틀릴 수 있음(첫 번째로 틀린 때부터 24시간) | `422 verification_locked` |
+| 활성화 코드 입력 | 카드별 5번까지 시도(첫 시도부터 24시간, 맞으면 초기화, 발급사 오류로 끝난 시도도 셈) | `422 verification_locked` |
+| 카드 상세정보 조회 | 카드별 시간당 10번(매시 정각 UTC에 초기화) | `429 rate_limited`, `Retry-After`(다음 정각까지) |
 
 - `429`는 `Retry-After`(초) 뒤에 **새 시각으로 다시 서명**해 보낸다.
 - 한 IP에서 초당 10회를 넘지 않게 조절한다. 앞단의 `429`는 JSON이 아닐 수 있으므로 본문 파싱 실패를 별도 오류로 처리하지 않는다.

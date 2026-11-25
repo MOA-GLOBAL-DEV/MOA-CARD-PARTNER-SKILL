@@ -141,7 +141,7 @@ PIN을 회원 기기에서 암호화할 회사 공개키. 파트너사 서버가
 
 성공: `200` + Member(`link_status: linked`). 같은 이메일로 이미 승인된 KYC가 있으면 바로 `approved`로 보인다. 멱등 재전송 시 `data: null`.
 
-- 틀린 입력은 회원당 24시간에 5번까지. **다섯 번째로 틀리면 `422 verification_locked`**, 24시간 동안 확인과 재요청(`429`) 모두 거절. 새 번호를 받아도 횟수는 줄지 않는다.
+- 틀린 입력은 회원당 5번까지. **다섯 번째로 틀리면 `422 verification_locked`**, 첫 번째로 틀린 때부터 24시간 동안 확인과 재요청(`429`) 모두 거절(그동안 번호가 10분 지나 만료되면 확인은 `verification_code_expired`). 새 번호를 받아도 횟수는 줄지 않는다.
 
 오류: `422 invalid_verification_code`, `422 verification_code_expired`(요청 안 함·10분 경과 → 새로 요청), `422 verification_locked`, `409 invalid_state`(이미 `linked`), `404 member_not_found`.
 
@@ -389,7 +389,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 성공 `200` + Card(`status: active`), 알림 `card.activated`.
 
 - `encrypted_pin`을 먼저 확인(`422 pin_invalid`)한 뒤 활성화 코드를 확인한다.
-- 활성화 코드는 카드당 24시간에 5번까지. **다섯 번째로 틀리면 `422 verification_locked`**, 24시간 동안 맞는 코드도 거절.
+- 활성화 코드는 카드당 5번까지 시도(맞으면 초기화, 발급사 오류로 끝난 시도도 셈). **다섯 번째가 틀리면 `422 verification_locked`**, 첫 시도부터 24시간 동안 맞는 코드도 거절.
 
 오류: `422 pin_invalid`, `422 invalid_activation_code`, `422 verification_locked`, `409 invalid_state`(`inactive` 아님), `404 card_not_found`, `503 issuer_unavailable`(같은 키로 재시도).
 
@@ -438,7 +438,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 
 ### 23. POST /cards/{card_id}/sensitive — 카드 상세정보
 
-카드번호·유효기간·CVV를 **회원 기기 공개키**로 암호화해 준다. 조회지만 공개키를 본문으로 받으므로 POST. 요청 고유키는 필요하지만 응답은 저장되지 않는다. 조건: 카드 `active`·`frozen`, 카드당 시간당 10번.
+카드번호·유효기간·CVV를 **회원 기기 공개키**로 암호화해 준다. 조회지만 공개키를 본문으로 받으므로 POST. 요청 고유키는 필요하지만 응답은 저장되지 않는다. 조건: 카드 `active`·`frozen`, 카드당 시간당 10번(매시 정각 UTC에 초기화).
 
 | 필드 | 타입 | 필수 | 제약 |
 |---|---|---|---|
@@ -470,7 +470,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 | `verification_code` | string | Y | 1~16자(받은 6자리 인증번호) |
 | `encrypted_pin` | string | Y | 1~4096자, 새 PIN의 JWE(19번과 같은 형식) |
 
-성공 `200` + Card. `encrypted_pin`을 먼저 확인하고 인증번호를 확인한다. 맞으면 그 인증번호는 다시 쓸 수 없다. 틀린 입력은 카드당 24시간에 5번(다섯 번째 `422 verification_locked`).
+성공 `200` + Card. `encrypted_pin`을 먼저 확인하고 인증번호를 확인한다. 맞으면 그 인증번호는 다시 쓸 수 없다. 틀린 입력은 카드당 5번(다섯 번째 `422 verification_locked`, 첫 번째로 틀린 때부터 24시간).
 
 오류: `422 pin_invalid`, `422 invalid_verification_code`, `422 verification_code_expired`, `422 verification_locked`, `409 invalid_state`, `404 card_not_found`.
 
@@ -624,7 +624,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 
 ## 테스트 전용(`pk_test_` 키에서만)
 
-운영 키로 부르면 `404 not_found`. POST에는 다른 API처럼 요청 고유키가 필요하다. 자세한 동작은 `test-environment.md`.
+운영 키로 부르면 `404 not_found`(운영 환경이 열리기 전에는 먼저 `403 environment_unavailable`). POST에는 다른 API처럼 요청 고유키가 필요하다. 자세한 동작은 `test-environment.md`.
 
 ### 37. GET /test/card-inventory
 
