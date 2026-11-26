@@ -349,7 +349,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 }
 ```
 
-- 카드 첫 잔액 = 입금액 − 발급사 수수료(입금액 × `issuer_fee_percent`, half-up) − 등록 수수료. `amount_due` = `min_amount`는 잔액이 `activation_amount.min` 이상인 가장 작은 입금, `max_amount`는 `activation_amount.max` 이하인 가장 큰 입금(예: 최소 100·최대 1,000, 발급사 1.0%, 등록 20 → 121.21·1030.30). `fees`에 `registration_fee`·`issuer_fee_percent`.
+- 카드 첫 잔액 = 입금액 − 발급사 수수료(입금액 × `issuer_fee_percent`, half-up) − 등록 수수료. `amount_due` = `min_amount`는 잔액이 `activation_amount.min` 이상인 가장 작은 입금, `max_amount`는 `activation_amount.max` 이하인 가장 큰 입금(예: 최소 100·최대 1,000, 발급사 1.0%, 등록 20 → 121.21·1030.30). 이 값이 입금 자산의 1회 최소 입금액(현재 모든 자산 1.00)보다 작으면 1회 최소 입금액이다. 입금 없이 카드 번호만으로 등록하는 방법은 없다(최소 활성화·등록 수수료가 0인 상품도 `amount_due` 1.00, 발급사 0.7%면 카드 첫 잔액 0.99). `fees`에 `registration_fee`·`issuer_fee_percent`.
 - 유효기간 60분(`expires_at`). 회원에게 입금 주소·자산·네트워크·`amount_due`·유효기간을 안내한다. 예시의 `deposit_address`는 테스트 자리표시 값.
 - 카드 번호 원문은 저장되지 않는다(가린 번호·참조값만).
 
@@ -542,7 +542,7 @@ KYC를 받는 국가(이름순). 페이지 없음.
 }
 ```
 
-- 충전 주문은 `amount_due`가 없다(`null`). 회원은 `min_amount`~`max_amount` 안의 금액을 보낸다.
+- 충전 주문은 `amount_due`가 없다(`null`). 회원은 `min_amount`~`max_amount` 안의 금액을 보낸다. `min_amount`는 입금 자산의 1회 최소 입금액(현재 1.00)보다 작지 않다.
 - 반영액이 0 이하면 주문 `failed`(`failure_code: amount_below_fees`) + `topup.failed`. 받은 입금은 예외 입금으로 처리한다(자동 반환 없음). 입금 뒤 카드가 차단·해지되어 있으면 `failed`(`card_not_active`). 정지(`frozen`) 카드는 충전된다.
 
 오류: `422 card_not_active`, `422 unsupported_asset`, `422 wallet_address_invalid`, `409 order_in_progress`, `409 wallet_address_in_use`, `404 card_not_found`, `503 issuer_unavailable`.
