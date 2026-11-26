@@ -42,7 +42,7 @@ KYC 공유 규칙(회원 = 이메일 단위):
 |---|---|---|
 | `product_id` | string | 카드 상품 ID |
 | `name` · `brand` | string | 상품 이름, 카드 브랜드(대문자) |
-| `activation_amount.min` · `max` | string | 공카드 등록 때 카드 첫 잔액(수수료를 뗀 금액)의 범위. 최소 활성화 금액이 없으면 `min`은 `"0.00"`(이때도 등록에는 입금이 필요하고, 입금할 금액은 주문 `amount_due` — 1회 최소 입금액 1.00 이상). 최대값이 없으면 `max`는 `topup_amount.max`와 같다 |
+| `activation_amount.min` · `max` | string | 공카드 등록 때 카드 첫 잔액(수수료를 뗀 금액)의 범위. 최소 활성화 금액이 없으면 `min`은 `"0.00"`(이때도 등록에는 입금이 필요하고, 입금할 금액은 주문 `amount_due` — 최소 입금액 2.00 이상). 최대값이 없으면 `max`는 `topup_amount.max`와 같다 |
 | `topup_amount.min` · `max` | string | 충전 1회 입금액 범위(수수료 포함 입금액 기준) |
 | `supported_nationalities` | array | 이용 가능한 국적 코드. 정보가 없으면 `[]` |
 | `supported_regions` | array | 이용 가능한 지역 코드. 정보가 없으면 `[]` |
